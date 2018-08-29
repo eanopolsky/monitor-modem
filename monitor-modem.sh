@@ -14,15 +14,22 @@
 
 HOSTS="8.8.8.8 64.6.64.6 208.67.222.222"
 
+print_syslog() {
+    logger -s --id=$$ -t monitor-modem "$1"
+}
+
+
 test_connectivity() {
     # Returns 0 if *any* host responds to ping.
     # If no hosts respond to ping, returns 1.
     for HOST in $HOSTS
-    do ping -c 4 $HOST
+    do ping -c 4 $HOST > /dev/null
        if [ "$?" = "0" ]
-       then return 0
+       then print_syslog "Connectivity check passed while pinging $HOST."
+	    return 0
        fi
     done
+    print_syslog "Connectivity check failed."
     return 1
 }
 
@@ -32,6 +39,7 @@ init_gpio() {
     # by applying +3.3V to GPIO 18. Controlling GPIO pins requires root
     # or gpio group membership on Raspbian.
     # Initialize the pin.
+    print_syslog "Initializing GPIO pin 18."
     echo "18" > /sys/class/gpio/export
     echo "out" > /sys/class/gpio/gpio18/direction
 }
@@ -39,10 +47,12 @@ init_gpio() {
 
 reset_modem() {
     # Cut power to the modem for ten seconds.
+    print_syslog "Power cycling modem for 10 seconds."
     echo "1" > /sys/class/gpio/gpio18/value
     sleep 10
     echo "0" > /sys/class/gpio/gpio18/value
 }
 
 init_gpio
+test_connectivity
 reset_modem
