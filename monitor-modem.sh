@@ -15,7 +15,7 @@
 HOSTS="8.8.8.8 64.6.64.6 208.67.222.222"
 
 print_syslog() {
-    logger -s --id=$$ -t monitor-modem "$1"
+    logger --id=$$ -t monitor-modem "$1"
 }
 
 
@@ -53,7 +53,14 @@ reset_modem() {
     echo "0" > /sys/class/gpio/gpio18/value
 }
 
+
 init_gpio
+
+# Sometimes it takes a few seconds for DHCP to get an IP and bring up the
+# network interface. Running ping before that happens results in a very quick
+# failure, causing the script to power cycle the modem unnecessarily. Sleeping
+# for a short period of time works around that problem.
+sleep 30
 
 while true
 do test_connectivity
