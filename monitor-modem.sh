@@ -26,5 +26,23 @@ test_connectivity() {
     return 1
 }
 
-test_connectivity
-echo $?
+init_gpio() {
+    # This script assumes that power to the modem is run through the C/NC
+    # terminals of a relay, and that the relay can be energized
+    # by applying +3.3V to GPIO 18. Controlling GPIO pins requires root
+    # or gpio group membership on Raspbian.
+    # Initialize the pin.
+    echo "18" > /sys/class/gpio/export
+    echo "out" > /sys/class/gpio/gpio18/direction
+}
+
+
+reset_modem() {
+    # Cut power to the modem for ten seconds.
+    echo "1" > /sys/class/gpio/gpio18/value
+    sleep 10
+    echo "0" > /sys/class/gpio/gpio18/value
+}
+
+init_gpio
+reset_modem
