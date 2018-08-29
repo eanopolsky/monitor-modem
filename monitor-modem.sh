@@ -54,5 +54,13 @@ reset_modem() {
 }
 
 init_gpio
-test_connectivity
-reset_modem
+
+while true
+do test_connectivity
+   if [ $? = "0" ]
+   then sleep 300
+	continue
+   fi
+   reset_modem
+   sleep 1800
+done
