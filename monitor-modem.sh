@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Which pin controls the relay that cuts power to the modem?
+#
+# On a keyestudio ks0212 hat, the relay mappings are as follows:
+# J2: pin 4
+# J3: pin 22
+# J4: pin 6
+# J5: pin 26
+
+RELAYPIN="22"
+
 # These hosts will be pinged to check the Internet connection.
 # If *all* of them fail to respond, then the Internet connection will
 # be considered down. Accordingly, it is important to choose hosts that
@@ -36,21 +46,21 @@ test_connectivity() {
 init_gpio() {
     # This script assumes that power to the modem is run through the C/NC
     # terminals of a relay, and that the relay can be energized
-    # by applying +3.3V to GPIO 18. Controlling GPIO pins requires root
+    # by applying +3.3V to $RELAYPIN. Controlling GPIO pins requires root
     # or gpio group membership on Raspbian.
     # Initialize the pin.
-    print_syslog "Initializing GPIO pin 18."
-    echo "18" > /sys/class/gpio/export
-    echo "out" > /sys/class/gpio/gpio18/direction
+    print_syslog "Initializing GPIO pin $RELAYPIN."
+    echo "$RELAYPIN" > /sys/class/gpio/export
+    echo "out" > "/sys/class/gpio/gpio${RELAYPIN}/direction"
 }
 
 
 reset_modem() {
     # Cut power to the modem for ten seconds.
     print_syslog "Power cycling modem for 10 seconds."
-    echo "1" > /sys/class/gpio/gpio18/value
+    echo "1" > "/sys/class/gpio/gpio${RELAYPIN}/value"
     sleep 10
-    echo "0" > /sys/class/gpio/gpio18/value
+    echo "0" > "/sys/class/gpio/gpio${RELAYPIN}/value"
 }
 
 
