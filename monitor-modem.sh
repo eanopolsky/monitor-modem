@@ -50,7 +50,9 @@ init_gpio() {
     # or gpio group membership on Raspbian.
     # Initialize the pin.
     print_syslog "Initializing GPIO pin $RELAYPIN."
-    echo "$RELAYPIN" > /sys/class/gpio/export
+    # If the following line is run more than once, it generates an ugly
+    # error in syslog when run under systemd.
+    echo "$RELAYPIN" > /sys/class/gpio/export &> /dev/null
     echo "out" > "/sys/class/gpio/gpio${RELAYPIN}/direction"
 }
 
