@@ -2,7 +2,9 @@
 
 # Which pin controls the relay that cuts power to the modem?
 #
-# On a keyestudio ks0212 hat, the relay mappings are as follows:
+# According to http://wiki.keyestudio.com/index.php/KS0212_keyestudio_RPI_4-channel_Relay_Shield
+# the keyestudio ks0212 board uses gpio pins 7, 3, 22, and 25 to control the
+# relays, but actual testing revealed the pins to be connected as follows:
 # J2: pin 4
 # J3: pin 22
 # J4: pin 6
@@ -13,11 +15,11 @@ RELAYPIN="22"
 # These hosts will be pinged to check the Internet connection.
 # If *all* of them fail to respond, then the Internet connection will
 # be considered down. Accordingly, it is important to choose hosts that
-# are almost always up and that never change their IPs (so that a failure
-# of the ISP's DNS server will not result in the modem being spuriously
-# power cycled). A small assortment of public DNS servers are the logical
-# choice.
-
+# are almost always up and can be referenced by IP rather than by hostname
+# (so that a failure of the ISP's DNS server will not result in the modem
+# being spuriously power cycled). A small assortment of public DNS servers
+# are the logical choice.
+# 
 # Google DNS: 8.8.8.8
 # Verisign DNS: 64.6.64.6
 # OpenDNS: 208.67.222.222
