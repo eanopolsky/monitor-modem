@@ -32,6 +32,9 @@ as an exercise to the reader.
 6. Clone this project to your Pi.
 
 7. Edit monitor-modem.sh and change the RELAYPIN variable to the GPIO pin you chose in step 4.
+Use the BCM pin number from this graphic: https://pinout.xyz/
+For example, if the relay is wired to the pin in the lower right corner of the image, use
+RELAYPIN="21", **not** RELAYPIN="40".
 
 8. (Optional) Customize the HOSTS variable to suit your tastes. The default will be fine for
 most people.
@@ -39,6 +42,21 @@ most people.
 9. From the project directory, run sudo make install.
 
 That's it!
+
+# FAQ
+
+Q: What happens if the Pi loses power?
+
+A: The modem will stay on, provided it has a good, independent power source. If the Pi
+loses power, the GPIO pin controlling the relay will stay at 0V. In this condition, the
+C and NC terminals on the relay will be connected, and power will flow to the modem.
+
+Cutting power to a Pi without first shutting down gracefully does sometimes cause SD card
+corruption. You can mitigate this by booting from a USB flash drive
+(https://www.raspberrypi.org/documentation/hardware/raspberrypi/bootmodes/msd.md) or using
+a UPS. If the Pi does suffer SD card corruption and fails to boot properly after power is
+restored, the GPIO pin controlling the relay will stay at 0V and power to the modem will
+stay on.
 
 # Development
 
