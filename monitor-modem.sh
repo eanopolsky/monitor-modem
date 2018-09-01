@@ -78,7 +78,7 @@ sleep 30
 
 while true
 do test_connectivity
-   if [ $? = "0" ]
+   if [ "$?" = "0" ]
    then sleep 300
 	continue
    fi
