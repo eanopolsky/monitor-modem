@@ -81,7 +81,19 @@ do test_connectivity
    if [ "$?" = "0" ]
    then sleep 300
 	continue
+   else
+       # Sometimes the connectivity check will fail, but the modem will recover
+       # on its own within seconds or minutes. Because it can take up to 10
+       # minutes for the modem to recover from a hard reboot, we give it one
+       # more chance to come back on its own first.
+       sleep 300
+       test_connectivity
+       if [ "$?" = "0" ]
+       then sleep 300
+	    continue
+       else
+	   reset_modem
+	   sleep 1800
+       fi
    fi
-   reset_modem
-   sleep 1800
 done
