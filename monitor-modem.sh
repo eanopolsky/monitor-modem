@@ -13,7 +13,9 @@ test_connectivity() {
     for HOST in $HOSTS
     do ping -c 4 $HOST > /dev/null
        if [ "$?" = "0" ]
-       then print_syslog "Connectivity check passed while pinging $HOST."
+       then if [ "$VERBOSELOGGING" = "1" ]
+	    then print_syslog "Connectivity check passed while pinging $HOST."
+	    fi
 	    return 0
        fi
     done
@@ -33,7 +35,6 @@ init_gpio() {
     echo "$RELAYPIN" > /sys/class/gpio/export &> /dev/null
     echo "out" > "/sys/class/gpio/gpio${RELAYPIN}/direction"
 }
-
 
 reset_modem() {
     # Cut power to the modem for ten seconds.
