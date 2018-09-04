@@ -9,3 +9,8 @@ install:
 	systemctl restart monitor-modem
 	systemctl enable monitor-modem
 
+uninstall:
+	systemctl stop monitor-modem
+	systemctl disable monitor-modem
+	rm /usr/local/sbin/monitor-modem.sh
+	rm /lib/systemd/system/monitor-modem.service
