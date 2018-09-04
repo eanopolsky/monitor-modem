@@ -10,7 +10,7 @@
 # J4: pin 6
 # J5: pin 26
 
-RELAYPIN="22"
+RELAYPIN="6"
 
 # These hosts will be pinged to check the Internet connection.
 # If *all* of them fail to respond, then the Internet connection will
