@@ -1,4 +1,5 @@
 install:
+	systemctl stop monitor-modem
 	cp monitor-modem.sh /usr/local/sbin/
 	chown root:root /usr/local/sbin/monitor-modem.sh
 	chmod 755 /usr/local/sbin/monitor-modem.sh
