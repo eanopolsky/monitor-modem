@@ -29,7 +29,9 @@ init_gpio() {
     # by applying +3.3V to $RELAYPIN. Controlling GPIO pins requires root
     # or gpio group membership on Raspbian.
     # Initialize the pin.
-    print_syslog "Initializing GPIO pin $RELAYPIN."
+    if [ "$VERBOSELOGGING" = "1" ]
+    then print_syslog "Initializing GPIO pin $RELAYPIN."
+    fi
     # If the following line is run more than once, it generates an ugly
     # error in syslog when run under systemd.
     echo "$RELAYPIN" > /sys/class/gpio/export &> /dev/null
