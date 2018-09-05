@@ -31,7 +31,7 @@ as an exercise to the reader.
 
 6. Clone this project to your Pi.
 
-7. Edit monitor-modem.cfg and change the RELAYPIN variable to the GPIO pin you chose in step 4.
+7. Copy monitor-modem.cfg.example to monitor-modem.cfg, and change the RELAYPIN variable to the GPIO pin you chose in step 4.
 Use the BCM pin number from this graphic: https://pinout.xyz/
 For example, if the relay is wired to the pin in the lower right corner of the image, use
 RELAYPIN="21", **not** RELAYPIN="40".

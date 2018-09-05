@@ -2,7 +2,7 @@
 # Set to "1" to enable.
 # Set to "0" to disable.
 
-VERBOSELOGGING="1"
+VERBOSELOGGING="0"
 
 # Which pin controls the relay that cuts power to the modem?
 #
