@@ -1,5 +1,4 @@
 install:
-	systemctl stop monitor-modem
 	#install scripts
 	cp monitor-modem.sh /usr/local/sbin/
 	chown root:root /usr/local/sbin/monitor-modem.sh
