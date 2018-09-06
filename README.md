@@ -62,10 +62,22 @@ into a different mode.
 SIGUSR2 puts monitor-modem into keep_link_up mode. This is the default mode, so
 SIGUSR2 is intended to reverse the effect of sending SIGUSR1.
 
+monitor-modem comes with a control script for sending these signals called
+monitor-modem-control.sh. Here is a sample crontab that turns off the modem
+between 2am and 5am every day, and leaves it on the rest of the time (unless
+the modem dies and needs to be power cycled).
+
+    0 2 * * * /usr/local/sbin/monitor-modem-control.sh keep_modem_off
+    0 5 * * * /usr/local/sbin/monitor-modem-control.sh keep_link_up
+
 Because monitor-modem spends most of its time sleeping, and because bash cannot
 act on a signal it has received until the currently executing command has
 finished, it may take several minutes for monitor-modem to switch modes after
 a signal has been received.
+
+Note for developers: If this delay in responding to mode switching ever becomes
+a problem, it can be worked around by running the sleep command as a
+subprocess and following up with a wait statement.
 
 # FAQ
 
