@@ -49,7 +49,7 @@ init_signal_control() {
     trap OPERATIONMODE="keep_link_up" SIGUSR2
 }
 
-init() {
+init_all() {
     init_gpio
     init_signal_control
 }
@@ -72,7 +72,7 @@ reset_modem() {
     power_on_modem
 }
 
-init
+init_all
 
 # Sometimes it takes a few seconds for DHCP to get an IP and bring up the
 # network interface. Running ping before that happens results in a very quick
