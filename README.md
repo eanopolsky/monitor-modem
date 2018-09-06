@@ -1,7 +1,10 @@
 # Description
 
 monitor-modem detects when an Internet connection has gone out and reboots the
-modem. It is designed to run on a Raspberry Pi 3 model B+, but may work on
+modem. Its behavior is configurable via signals. See the Signals section for
+details.
+
+It is designed to run on a Raspberry Pi 3 model B+, but may work on
 other Pi models.
 
 WARNING: High voltage is dangerous. Do not attempt to work with high voltage
@@ -46,6 +49,23 @@ will be fine for most people.
 9. From the project directory, run sudo make install.
 
 That's it!
+
+# Signals
+
+Sometimes it is desirable to power down the modem for administrative reasons.
+This can be done by sending signals to the monitor-modem.sh process.
+
+SIGUSR1 puts monitor-modem into keep_modem_off mode. In this mode, the modem
+is powered off and kept off until monitor-modem receives a signal putting it
+into a different mode.
+
+SIGUSR2 puts monitor-modem into keep_link_up mode. This is the default mode, so
+SIGUSR2 is intended to reverse the effect of sending SIGUSR1.
+
+Because monitor-modem spends most of its time sleeping, and because bash cannot
+act on a signal it has received until the currently executing command has
+finished, it may take several minutes for monitor-modem to switch modes after
+a signal has been received.
 
 # FAQ
 
