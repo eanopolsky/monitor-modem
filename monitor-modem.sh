@@ -22,6 +22,74 @@ test_connectivity() {
     return 1
 }
 
+power_off_modem() {
+    print_syslog "Powering off modem."
+    echo "1" > "/sys/class/gpio/gpio${RELAYPIN}/value"
+}
+
+power_on_modem() {
+    print_syslog "Powering on modem."
+    echo "0" > "/sys/class/gpio/gpio${RELAYPIN}/value"
+}
+
+reset_modem() {
+    # Cut power to the modem for ten seconds.
+    print_syslog "Power cycling modem for 10 seconds."
+    power_off_modem
+    sleep 10
+    power_on_modem
+}
+
+keep_link_up() {
+    while true
+    do test_connectivity
+       if [ "$?" = "0" ]
+       then sleep 300
+	    continue
+       else
+	   # Sometimes the connectivity check will fail, but the modem
+	   # will recover on its own within seconds or minutes. Because
+	   # it can take up to 10 minutes for the modem to recover from
+	   # a hard reboot, we give it one more chance to come back on
+	   # its own first.
+	   sleep 300
+	   test_connectivity
+	   if [ "$?" = "0" ]
+	   then sleep 300
+		continue
+	   else
+	       reset_modem
+	       sleep 1800
+	   fi
+       fi
+    done
+}
+
+switch_to_keep_link_up() {
+    # In case we are switching from keep_modem_off mode, give the modem time
+    # to come up before checking the connection.
+    power_on_modem
+    sleep 1800 &
+    wait $! &> /dev/null
+    
+    keep_link_up &
+}
+
+switch_to_keep_modem_off() {
+    jobs -r | grep keep_link_up > /dev/null
+    if [ "$?" = 0 ]
+    then KEEP_LINK_UP_PID=$(jobs -rl | grep keep_link_up|awk '{print $2}')
+	 kill $KEEP_LINK_UP_PID
+    fi
+    power_off_modem
+}
+
+exit_cleanly() {
+    kill $(jobs -p) &> /dev/null
+    print_syslog "Exiting."
+    exit 0
+}
+
 init_gpio() {
     # This script assumes that power to the modem is run through the C/NC
     # terminals of a relay, and that the relay can be energized
@@ -44,32 +112,14 @@ init_gpio() {
 # is received setting it back to the default mode. This is designed to allow
 # Internet access to be scheduled with cron.
 init_signal_control() {
-    OPERATIONMODE="keep_link_up"
-    trap OPERATIONMODE="keep_modem_off" SIGUSR1
-    trap OPERATIONMODE="keep_link_up" SIGUSR2
+    trap switch_to_keep_modem_off SIGUSR1
+    trap switch_to_keep_link_up SIGUSR2
+    trap exit_cleanly INT TERM EXIT
 }
 
 init_all() {
     init_gpio
     init_signal_control
-}
-
-power_off_modem() {
-    print_syslog "Powering off modem."
-    echo "1" > "/sys/class/gpio/gpio${RELAYPIN}/value"
-}
-
-power_on_modem() {
-    print_syslog "Powering on modem."
-    echo "0" > "/sys/class/gpio/gpio${RELAYPIN}/value"
-}
-
-reset_modem() {
-    # Cut power to the modem for ten seconds.
-    print_syslog "Power cycling modem for 10 seconds."
-    power_off_modem
-    sleep 10
-    power_on_modem
 }
 
 init_all
@@ -80,37 +130,10 @@ init_all
 # for a short period of time works around that problem.
 sleep 30
 
+switch_to_keep_link_up
 while true
-do if [ "$OPERATIONMODE" = "keep_link_up" ]
-   then test_connectivity
-	if [ "$?" = "0" ]
-	then sleep 300
-	     continue
-	else
-	    # Sometimes the connectivity check will fail, but the modem
-	    # will recover on its own within seconds or minutes. Because
-	    # it can take up to 10 minutes for the modem to recover from
-	    # a hard reboot, we give it one more chance to come back on
-	    # its own first.
-	    sleep 300
-	    test_connectivity
-	    if [ "$?" = "0" ]
-	    then sleep 300
-		 continue
-	    else
-		reset_modem
-		sleep 1800
-	    fi
-	fi
-   elif [ "$OPERATIONMODE" = "keep_modem_off" ]
-   then power_off_modem
-	while [ "$OPERATIONMODE" = "keep_modem_off" ]
-	do sleep 60
-	done
-	power_on_modem
-	# Give the modem time to reestablish a connection before considering
-	# power cycling it in keep_link_up mode:
-	sleep 1800 
-   else print_syslog "Unsupported operation mode."; exit 1
-   fi
+do sleep 3600 &
+   # wait is necessary so that the main loop will not block the reception and
+   # processing of signals.
+   wait $! &>/dev/null
 done
