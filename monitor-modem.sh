@@ -101,7 +101,7 @@ init_gpio() {
     fi
     # If the following line is run more than once, it generates an ugly
     # error in syslog when run under systemd.
-    echo "$RELAYPIN" > /sys/class/gpio/export &> /dev/null
+    echo "$RELAYPIN" > /sys/class/gpio/export 2> /dev/null
     echo "out" > "/sys/class/gpio/gpio${RELAYPIN}/direction"
 }
 
