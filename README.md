@@ -57,7 +57,10 @@ This can be done by sending signals to the monitor-modem.sh process.
 
 SIGUSR1 puts monitor-modem into keep_modem_off mode. In this mode, the modem
 is powered off and kept off until monitor-modem receives a signal putting it
-into a different mode.
+into a different mode. Take care when putting monitor-modem into this mode
+remotely as the modem will stay off until monitor-modem is sent SIGUSR2, the Pi
+is power cycled itself, or someone physically restores power to the modem on
+site.
 
 SIGUSR2 puts monitor-modem into keep_link_up mode. This is the default mode, so
 SIGUSR2 is intended to reverse the effect of sending SIGUSR1.
@@ -69,15 +72,6 @@ the modem dies and needs to be power cycled).
 
     0 2 * * * /usr/local/sbin/monitor-modem-control.sh keep_modem_off
     0 5 * * * /usr/local/sbin/monitor-modem-control.sh keep_link_up
-
-Because monitor-modem spends most of its time sleeping, and because bash cannot
-act on a signal it has received until the currently executing command has
-finished, it may take several minutes for monitor-modem to switch modes after
-a signal has been received.
-
-Note for developers: If this delay in responding to mode switching ever becomes
-a problem, it can be worked around by running the sleep command as a
-subprocess and following up with a wait statement.
 
 # FAQ
 
