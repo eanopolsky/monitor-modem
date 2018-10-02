@@ -10,7 +10,7 @@ test_connectivity() {
     # Returns 0 if *any* host responds to ping.
     # If no hosts respond to ping, returns 1.
     for HOST in $HOSTS
-    do ping -c 4 $HOST > /dev/null
+    do ping -c 4 $HOST > /dev/null 2> /dev/null
        if [ "$?" = "0" ]
        then if [ "$VERBOSELOGGING" = "1" ]
 	    then print_syslog "Connectivity check passed while pinging $HOST."
